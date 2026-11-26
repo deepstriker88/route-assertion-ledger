@@ -1,0 +1,1 @@
+[{"operation":"GET /items","status":200,"asserted":true},{"operation":"GET /items/{id}","status":200,"asserted":true},{"operation":"GET /items/{id}","status":404,"asserted":false},{"operation":"DELETE /items/{id}","status":204,"asserted":true}]

@@ -1,0 +1,1 @@
+{"required_statuses":{"GET /items/{id}":[200,404]}}
