@@ -243,8 +243,15 @@ def launch(adapter, *, root=None, run_loop=True):
                 widget.configure(wraplength=w)
 
         def make_field(self, field, row):
-            label=field.label+(" (optional)" if field.optional and field.key not in getattr(self.adapter,"CONDITIONAL_FIELDS",()) else "")
-            ttk.Label(self.inputs,text=label,style="PanelMuted.TLabel",wraplength=105).grid(row=row,column=0,sticky="w",pady=0,padx=(0,6))
+            # Compact visual labels preserve the full Field.label for dialogs and
+            # required-field messages. Avoid three-line wraps at 125% Windows DPI.
+            short_labels={"mode":"Check type","specs":"Spec files","spec":"API spec",
+                          "evidence":"Assertions","format":"Format",
+                          "policy":"Policy\n(optional)","pin":"SHA-256 pin\n(optional)"}
+            label=short_labels.get(field.key,field.label+(" (optional)" if field.optional and field.key not in getattr(self.adapter,"CONDITIONAL_FIELDS",()) else ""))
+            from tkinter.font import nametofont
+            family=nametofont("TkDefaultFont").actual("family")
+            ttk.Label(self.inputs,text=label,style="PanelMuted.TLabel",font=(family,10),wraplength=105).grid(row=row,column=0,sticky="w",pady=0,padx=(0,6))
             if field.kind in ("file","files","directory"):
                 self.values[field.key]=() if field.kind=="files" else ""
                 holder=ttk.Frame(self.inputs,style="Panel.TFrame")

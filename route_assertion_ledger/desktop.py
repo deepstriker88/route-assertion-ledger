@@ -41,7 +41,7 @@ FIELDS=(
     Field("evidence","Assertion records","file",optional=True,filters=(("Evidence","*.json *.jsonl"),("All files","*"))),
     Field("format","Evidence format","choice",choices=("JSON","JSONL"),default="JSON"),
     Field("policy","JSON policy","file",optional=True,filters=(("JSON","*.json"),("All files","*"))),
-    Field("pin","Scope SHA-256","text",optional=True),
+    Field("pin","Reviewed scope SHA-256","text",optional=True),
 )
 
 

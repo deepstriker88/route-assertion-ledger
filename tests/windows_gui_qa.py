@@ -49,6 +49,8 @@ def geometry(app,w,h):
         for child in panel.winfo_children():
             if not child.winfo_ismapped():continue
             x,y=child.winfo_rootx()-px,child.winfo_rooty()-py
+            if not (x>=0 and y>=0 and x+child.winfo_width()<=panel.winfo_width()+1 and y+child.winfo_height()<=panel.winfo_height()+1):
+                print("Panel geometry:",[(c.winfo_class(),c.cget("text") if "text" in c.keys() else "",c.winfo_rooty()-py,c.winfo_height(),c.winfo_reqheight()) for c in panel.winfo_children() if c.winfo_ismapped()],flush=True)
             require(x>=0 and y>=0 and x+child.winfo_width()<=panel.winfo_width()+1 and y+child.winfo_height()<=panel.winfo_height()+1,
                     f"{app.adapter.TITLE} panel child clipped in {w,h}: {child.winfo_class()} at {x,y} size {child.winfo_width(),child.winfo_height()} vs {panel.winfo_width(),panel.winfo_height()}")
     return {"window":[root.winfo_width(),root.winfo_height()],"controls":rows}
