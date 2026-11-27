@@ -1,0 +1,37 @@
+name: Windows packaged GUI QA
+on:
+  pull_request:
+    paths:
+      - "route_assertion_ledger/**"
+      - "tests/**"
+      - "build_zipapp.py"
+      - ".github/workflows/windows-gui.yml"
+permissions:
+  contents: read
+jobs:
+  native-windows:
+    runs-on: windows-2025
+    timeout-minutes: 8
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.12", "3.14"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Unit and packaged tests
+        run: python -B -m unittest discover -s tests -q
+      - name: Build exact candidate
+        run: python -B build_zipapp.py route-assertion-ledger.pyz
+      - name: Native GUI
+        run: |
+          python -B tests/windows_gui_qa.py route-assertion-ledger.pyz
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B tests/windows_gui_qa.py route-assertion-ledger.pyz 1.5
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B tests/windows_gui_qa.py route-assertion-ledger.pyz 1.667
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

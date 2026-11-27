@@ -131,7 +131,7 @@ def launch(adapter, *, root=None, run_loop=True):
             style.configure("Primary.TButton", background=self.mint, foreground="#ffffff", font=(default.actual("family"), 11, "bold"))
             style.map("Primary.TButton", background=[("disabled", "#d7dce3"), ("active", "#173e80")], foreground=[("disabled", "#697280")])
             style.configure("TEntry", fieldbackground="#ffffff", foreground=self.fg, insertcolor=self.fg, padding=6)
-            style.configure("TCombobox", fieldbackground="#ffffff", foreground=self.fg, padding=5)
+            style.configure("TCombobox", fieldbackground="#ffffff", foreground=self.fg, padding=6)
             style.map("TCombobox", fieldbackground=[("readonly", "#ffffff")], foreground=[("readonly", self.fg)])
             outer = ttk.Frame(self.root, padding=12)
             outer.pack(fill="both", expand=True)
@@ -143,10 +143,10 @@ def launch(adapter, *, root=None, run_loop=True):
             self.body.columnconfigure(0, weight=1, uniform="panel")
             self.body.columnconfigure(1, weight=1, uniform="panel")
             self.body.rowconfigure(0, weight=1)
-            self.inputs = ttk.Frame(self.body, style="Panel.TFrame", padding=12)
+            self.inputs = ttk.Frame(self.body, style="Panel.TFrame", padding=(10,6))
             self.inputs.grid(row=0, column=0, sticky="nsew", padx=(0, 6))
             self.inputs.columnconfigure(1, weight=1)
-            ttk.Label(self.inputs, text="Inputs", style="Section.TLabel").grid(row=0,column=0,columnspan=2,sticky="w",pady=(0,5))
+            ttk.Label(self.inputs, text="Inputs", style="Section.TLabel").grid(row=0,column=0,columnspan=2,sticky="w",pady=(0,2))
             row = 1
             for field in adapter.FIELDS:
                 existing=set(self.inputs.winfo_children())
@@ -154,7 +154,7 @@ def launch(adapter, *, root=None, run_loop=True):
                 self.field_widgets[field.key]=[w for w in self.inputs.winfo_children() if w not in existing]
                 row += 1
             actions = ttk.Frame(self.inputs, style="Panel.TFrame")
-            actions.grid(row=row,column=0,columnspan=2,sticky="ew",pady=(4,0))
+            actions.grid(row=row,column=0,columnspan=2,sticky="ew",pady=(2,0))
             self.run_button = ttk.Button(actions, text="Run check", style="Primary.TButton", command=self.run_check)
             self.run_button.pack(side="left", fill="x", expand=True)
             self.demo_button = ttk.Button(actions, text="Try example", command=self.run_demo)
@@ -243,12 +243,19 @@ def launch(adapter, *, root=None, run_loop=True):
                 widget.configure(wraplength=w)
 
         def make_field(self, field, row):
-            label=field.label+(" (optional)" if field.optional and field.key not in getattr(self.adapter,"CONDITIONAL_FIELDS",()) else "")
-            ttk.Label(self.inputs,text=label,style="PanelMuted.TLabel",wraplength=105).grid(row=row,column=0,sticky="w",pady=2,padx=(0,8))
+            # Compact visual labels preserve the full Field.label for dialogs and
+            # required-field messages. Avoid three-line wraps at 125% Windows DPI.
+            short_labels={"mode":"Check type","specs":"Spec files","spec":"API spec",
+                          "evidence":"Assertions","format":"Format",
+                          "policy":"Policy\n(optional)","pin":"SHA-256 pin\n(optional)"}
+            label=short_labels.get(field.key,field.label+(" (optional)" if field.optional and field.key not in getattr(self.adapter,"CONDITIONAL_FIELDS",()) else ""))
+            from tkinter.font import nametofont
+            family=nametofont("TkDefaultFont").actual("family")
+            ttk.Label(self.inputs,text=label,style="PanelMuted.TLabel",font=(family,10),wraplength=105).grid(row=row,column=0,sticky="w",pady=0,padx=(0,6))
             if field.kind in ("file","files","directory"):
                 self.values[field.key]=() if field.kind=="files" else ""
                 holder=ttk.Frame(self.inputs,style="Panel.TFrame")
-                holder.grid(row=row,column=1,sticky="ew",pady=2)
+                holder.grid(row=row,column=1,sticky="ew",pady=0)
                 holder.columnconfigure(1,weight=1)
                 b=ttk.Button(holder,text="Choose",width=7,command=lambda f=field:self.pick(f))
                 b.grid(row=0,column=0,sticky="w")
@@ -268,7 +275,7 @@ def launch(adapter, *, root=None, run_loop=True):
                     w._idle_state="readonly"
                 else:
                     w=ttk.Entry(self.inputs,textvariable=v,width=15)
-                w.grid(row=row,column=1,sticky="ew",pady=2)
+                w.grid(row=row,column=1,sticky="ew",pady=0)
                 self.controls.append(w)
                 v.trace_add("write",lambda *_:self.invalidate())
 
