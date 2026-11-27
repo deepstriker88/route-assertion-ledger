@@ -131,7 +131,7 @@ def launch(adapter, *, root=None, run_loop=True):
             style.configure("Primary.TButton", background=self.mint, foreground="#ffffff", font=(default.actual("family"), 11, "bold"))
             style.map("Primary.TButton", background=[("disabled", "#d7dce3"), ("active", "#173e80")], foreground=[("disabled", "#697280")])
             style.configure("TEntry", fieldbackground="#ffffff", foreground=self.fg, insertcolor=self.fg, padding=6)
-            style.configure("TCombobox", fieldbackground="#ffffff", foreground=self.fg, padding=5)
+            style.configure("TCombobox", fieldbackground="#ffffff", foreground=self.fg, padding=6)
             style.map("TCombobox", fieldbackground=[("readonly", "#ffffff")], foreground=[("readonly", self.fg)])
             outer = ttk.Frame(self.root, padding=12)
             outer.pack(fill="both", expand=True)

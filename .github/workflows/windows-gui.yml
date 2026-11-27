@@ -28,4 +28,10 @@ jobs:
       - name: Build exact candidate
         run: python -B build_zipapp.py route-assertion-ledger.pyz
       - name: Native GUI
-        run: python -B tests/windows_gui_qa.py route-assertion-ledger.pyz
+        run: |
+          python -B tests/windows_gui_qa.py route-assertion-ledger.pyz
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B tests/windows_gui_qa.py route-assertion-ledger.pyz 1.5
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B tests/windows_gui_qa.py route-assertion-ledger.pyz 1.667
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

@@ -73,6 +73,8 @@ def check_product(name,module,kit,evidence):
     ui=importlib.import_module(module+".desktop_ui")
     import tkinter as tk
     root=tk.Tk()
+    if len(sys.argv)>2:root.tk.call("tk","scaling",float(sys.argv[2]))
+    print("Tk scaling:",root.tk.call("tk","scaling"),"DPI:",root.winfo_fpixels("1i"),flush=True)
     app=ui.launch(adapter,root=root,run_loop=False)
     rows=[]
     try:
