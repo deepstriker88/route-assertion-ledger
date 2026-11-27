@@ -1,0 +1,64 @@
+{
+  "assert_all_observed": true,
+  "issues": [
+    {
+      "code": "missing_required_statuses",
+      "operation": "GET /items/{id}",
+      "statuses": [
+        404
+      ]
+    },
+    {
+      "code": "observed_status_not_asserted",
+      "operation": "GET /items/{id}",
+      "statuses": [
+        404
+      ]
+    }
+  ],
+  "ok": false,
+  "operations": [
+    {
+      "asserted_statuses": [
+        200
+      ],
+      "missing_required_statuses": [],
+      "observed_statuses": [
+        200
+      ],
+      "operation": "GET /items",
+      "records": 1,
+      "state": "covered",
+      "unasserted_statuses": []
+    },
+    {
+      "asserted_statuses": [
+        200
+      ],
+      "missing_required_statuses": [
+        404
+      ],
+      "observed_statuses": [
+        200,
+        404
+      ],
+      "operation": "GET /items/{id}",
+      "records": 2,
+      "state": "missing_required",
+      "unasserted_statuses": [
+        404
+      ]
+    }
+  ],
+  "scope": "declared_paths_only",
+  "scope_sha256": "3c40364895a5b9f4a20e259a1b8b785bc29bbe06bc1f696ee40f543da6f029b1",
+  "summary": {
+    "covered": 1,
+    "declared": 2,
+    "excluded": 0,
+    "in_scope": 2,
+    "issues": 2,
+    "observations": 3
+  },
+  "version": 1
+}

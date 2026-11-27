@@ -9,6 +9,25 @@ from . import (InvalidInput, MAX_SPEC_BYTES, MAX_EVIDENCE_BYTES, MAX_POLICY_BYTE
 from .report import html_report
 
 
+_WINDOWS = os.name == "nt"
+
+def _same_file_cross_api(a, b):
+    if not stat.S_ISREG(a.st_mode) or not stat.S_ISREG(b.st_mode):
+        return False
+    if any(getattr(x, "st_file_attributes", 0) & getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0) for x in (a,b)):
+        return False
+    if not a.st_ino or not b.st_ino:
+        return False
+    fields = ("st_dev", "st_ino", "st_size", "st_mtime_ns")
+    if any(getattr(a,k) != getattr(b,k) for k in fields):
+        return False
+    if not _WINDOWS:
+        return a.st_ctime_ns == b.st_ctime_ns
+    # Windows Python >=3.12: compare creation time explicitly, not ctime.
+    birth_a = getattr(a, "st_birthtime_ns", None)
+    birth_b = getattr(b, "st_birthtime_ns", None)
+    return birth_a is not None and birth_a == birth_b
+
 def _file_identity(info):
     return info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns
 
@@ -22,13 +41,13 @@ def read_input(path, limit, *, jsonl=False):
     fd = os.open(path, flags)
     with os.fdopen(fd, "rb") as f:
         opened = os.fstat(f.fileno())
-        if not stat.S_ISREG(opened.st_mode) or _file_identity(opened) != _file_identity(before):
+        if not stat.S_ISREG(opened.st_mode) or not _same_file_cross_api(before, opened) or (not _WINDOWS and _file_identity(opened) != _file_identity(before)):
             raise InvalidInput("input changed during read")
         raw = f.read(opened.st_size + 1)
         final = os.fstat(f.fileno())
         named = path.lstat()
         if (len(raw) != opened.st_size or _file_identity(final) != _file_identity(opened)
-                or not stat.S_ISREG(named.st_mode) or _file_identity(named) != _file_identity(opened)):
+                or not stat.S_ISREG(named.st_mode) or _file_identity(named) != _file_identity(before) or not _same_file_cross_api(named, final)):
             raise InvalidInput("input changed during read")
         return load_observations_jsonl(raw) if jsonl else load_json(raw, limit)
 

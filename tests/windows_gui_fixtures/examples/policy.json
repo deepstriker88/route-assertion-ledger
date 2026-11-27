@@ -1,0 +1,8 @@
+{
+  "assert_all_observed": true,
+  "required_statuses": {
+    "GET /items/{id}": [
+      404
+    ]
+  }
+}
